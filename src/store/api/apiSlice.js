@@ -1,32 +1,50 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { setToken, logout } from '../authSlice';
+import { logout } from '../authSlice';
+import { getAccessToken, setAccessToken } from '../../utils/tokenManager';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  credentials: 'include', // CRITICAL: Send cookies with every request
-  prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.token;
+  credentials: 'include', // CRITICAL: Send cookies (for refresh token)
+  prepareHeaders: (headers) => {
+    // Get token from memory, not Redux state
+    const token = getAccessToken();
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
     return headers;
-  },
+  }
 });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    // try to get a new token
-    const refreshResult = await baseQuery({ url: '/auth/refresh', method: 'POST' }, api, extraOptions);
+    console.log('🔄 Access token expired, attempting refresh...');
+    
+    // Try to refresh the access token
+    const refreshResult = await baseQuery(
+      { url: '/auth/refresh', method: 'POST' },
+      api,
+      extraOptions
+    );
 
-    if (refreshResult.data) {
-      // store the new token
-      api.dispatch(setToken(refreshResult.data.token));
-      // retry the initial query
+    if (refreshResult.data && refreshResult.data.accessToken) {
+      // Store new access token in memory
+      setAccessToken(refreshResult.data.accessToken);
+      
+      console.log('✅ Access token refreshed successfully');
+      
+      // Retry the original request
       result = await baseQuery(args, api, extraOptions);
     } else {
+      // Refresh failed - logout user
+      console.error('❌ Token refresh failed, logging out...');
       api.dispatch(logout());
+      
+      // Optionally redirect to login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
   }
   return result;

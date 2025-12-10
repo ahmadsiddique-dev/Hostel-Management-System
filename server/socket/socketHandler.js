@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-// Socket.IO Authentication Middleware
+// Socket.IO Authentication Middleware 
 const authenticateSocket = (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
@@ -12,7 +12,7 @@ const authenticateSocket = (socket, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Attach user info to socket
-    socket.userId = decoded.id;
+    socket.userId = decoded.id; 
     socket.userRole = decoded.role;
     
     console.log(`✅ Socket authenticated: User ${decoded.id} (${decoded.role})`);

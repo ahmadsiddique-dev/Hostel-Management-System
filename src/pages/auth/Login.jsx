@@ -31,14 +31,16 @@ const Login = () => {
       const { data } = await api.post('/auth/login', payload);
 
       // Only allow students on this login page
-      if (data.role === 'admin') {
+      if (data.user.role === 'admin') {
         toast.error('Please use the Admin Portal to login.');
         setLoading(false);
         return;
       }
 
-      dispatch(setCredentials({ user: data, token: data.token })); // @REVIEW: Redux Check
-      toast.success(`Welcome back, ${data.name}!`);
+      // New auth structure: { user, accessToken }
+      // Refresh token is in httpOnly cookie
+      dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
+      toast.success(`Welcome back, ${data.user.name}!`);
       navigate('/student/dashboard');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';

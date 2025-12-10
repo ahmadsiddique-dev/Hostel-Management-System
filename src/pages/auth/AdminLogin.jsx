@@ -23,14 +23,16 @@ const AdminLogin = () => {
       const api = await import('@/lib/api').then(m => m.default);
       const { data } = await api.post('/auth/login', { email, password });
       
-      if (data.role !== 'admin') {
-        toast.error('Access Denied. This portal is for Administrators only.');
+      // Only allow admins on this login page
+      if (data.user.role !== 'admin') {
+        toast.error('Please use the Student Portal to login.');
         setLoading(false);
         return;
       }
 
-      dispatch(setCredentials({ user: data, token: data.token }));
-      toast.success(`Welcome back, ${data.name}!`);
+      // New auth structure: { user, accessToken }
+      dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
+      toast.success(`Welcome back, ${data.user.name}!`);
       navigate('/admin/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed. Please try again.');
@@ -38,6 +40,7 @@ const AdminLogin = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     const ctx = gsap.context(() => {
