@@ -20,7 +20,7 @@ const StudentRegistration = () => {
     address: '', roomType: 'standard', password: '', confirmPassword: ''
   });
 
-  const [registerStudent, { isLoading }] = useRegisterStudentMutation();
+  const [registerStudent, { isLoading }] = useRegisterStudentMutation(); // @REVIEW: Query Check
 
   const roomRates = {
     standard: 15000,

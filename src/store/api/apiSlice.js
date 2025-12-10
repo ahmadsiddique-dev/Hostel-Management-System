@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { setToken, logout } from '../authSlice';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:5000/api',
+  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   credentials: 'include', // CRITICAL: Send cookies with every request
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.token;
@@ -96,6 +96,10 @@ export const api = createApi({
       }),
       invalidatesTags: ['Attendance'],
     }),
+    getAttendanceByDate: builder.query({
+      query: (date) => `/manager/attendance/${date}`,
+      providesTags: ['Attendance'],
+    }),
     
     // Notifications Management (Admin)
     sendNotification: builder.mutation({
@@ -181,6 +185,7 @@ export const {
   useGetRoomsQuery,
   useCreateRoomMutation,
   useMarkAttendanceMutation,
+  useGetAttendanceByDateQuery,
   useSendNotificationMutation,
   useGetComplaintsQuery,
   useUpdateComplaintStatusMutation,

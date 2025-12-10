@@ -84,8 +84,13 @@ feeSchema.virtual('isOverdue').get(function() {
   return this.status !== 'paid' && new Date() > this.dueDate;
 });
 
-// Pre-save hook to auto-update status
-feeSchema.pre('save', function(next) {
+// Pre-save hook to auto-calculate amount and update status
+feeSchema.pre('save', async function() {
+  // Auto-calculate total amount from roomRent + messFee
+  if (this.isModified('roomRent') || this.isModified('messFee')) {
+    this.amount = this.roomRent + this.messFee;
+  }
+  
   // Auto-update status based on payment
   if (this.paidAmount >= this.amount) {
     this.status = 'paid';
@@ -94,8 +99,6 @@ feeSchema.pre('save', function(next) {
   } else if (new Date() > this.dueDate) {
     this.status = 'overdue';
   }
-  
-  next();
 });
 
 // Static method to get pending fees for a student

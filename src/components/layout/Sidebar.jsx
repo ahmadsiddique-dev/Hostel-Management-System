@@ -22,8 +22,8 @@ const Sidebar = ({ role }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('token'); // @REVIEW: JWT
+    localStorage.removeItem('user'); // @REVIEW: JWT
     navigate('/login');
   };
 

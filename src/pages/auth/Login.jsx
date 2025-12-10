@@ -29,7 +29,7 @@ const Login = () => {
       };
 
       const { data } = await api.post('/auth/login', payload);
-      
+
       // Only allow students on this login page
       if (data.role === 'admin') {
         toast.error('Please use the Admin Portal to login.');
@@ -37,7 +37,7 @@ const Login = () => {
         return;
       }
 
-      dispatch(setCredentials({ user: data, token: data.token }));
+      dispatch(setCredentials({ user: data, token: data.token })); // @REVIEW: Redux Check
       toast.success(`Welcome back, ${data.name}!`);
       navigate('/student/dashboard');
     } catch (error) {
@@ -124,26 +124,6 @@ const Login = () => {
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
-
-          <div className="relative login-content">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 login-content">
-            <Button variant="outline" className="h-11 hover:bg-muted transition-colors">
-              <Github className="mr-2 h-4 w-4" />
-              Github
-            </Button>
-            <Button variant="outline" className="h-11 hover:bg-muted transition-colors">
-              <Chrome className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-          </div>
 
           <p className="text-center text-sm text-muted-foreground login-content">
             Don't have an account?{" "}

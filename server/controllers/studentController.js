@@ -12,7 +12,17 @@ const getProfile = async (req, res) => {
     console.log(`👤 Fetching profile for user: ${req.user._id}`);
     const student = await Student.findOne({ user: req.user._id })
       .populate('user', 'name email role')
-      .populate('room', 'number type capacity status');
+      .populate({
+        path: 'room',
+        select: 'number type capacity status occupants',
+        populate: {
+          path: 'occupants',
+          populate: {
+            path: 'user',
+            select: 'name'
+          }
+        }
+      });
     
     if (!student) {
       console.log('❌ Student profile not found');
@@ -76,26 +86,41 @@ const getNotifications = async (req, res) => {
 
     res.json(notifications);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error fetching notifications:', error);
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Create Complaint
 const createComplaint = async (req, res) => {
   try {
+    console.log('📝 Creating complaint for user:', req.user?._id);
     const { title, description } = req.body;
+    
+    if (!title || !description) {
+      console.log('❌ Missing required fields');
+      return res.status(400).json({ message: 'Title and description are required' });
+    }
+    
     const student = await Student.findOne({ user: req.user._id });
-    if (!student) return res.status(404).json({ message: 'Student profile not found' });
-
+    
+    if (!student) {
+      console.log('❌ Student profile not found for user:', req.user._id);
+      return res.status(404).json({ message: 'Student profile not found. Please contact admin.' });
+    }
+    
+    console.log('✅ Found student:', student._id);
     const complaint = await Complaint.create({
       student: student._id,
       title,
       description
     });
-
+    
+    console.log('✅ Complaint created successfully:', complaint._id);
     res.status(201).json(complaint);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error creating complaint:', error);
+    res.status(500).json({ message: error.message || 'Server error' });
   }
 };
 
@@ -108,7 +133,8 @@ const getMyComplaints = async (req, res) => {
     const complaints = await Complaint.find({ student: student._id }).sort({ createdAt: -1 });
     res.json(complaints);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error fetching complaints:', error);
+    res.status(500).json({ message: error.message });
   }
 };
 

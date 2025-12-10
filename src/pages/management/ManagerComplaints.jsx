@@ -9,8 +9,8 @@ import { useGetComplaintsQuery, useUpdateComplaintStatusMutation } from '@/store
 
 const ManagerComplaints = () => {
   const [filter, setFilter] = useState('all');
-  const { data: complaints = [], isLoading: loading } = useGetComplaintsQuery();
-  const [updateStatus] = useUpdateComplaintStatusMutation();
+  const { data: complaints = [], isLoading: loading } = useGetComplaintsQuery(); // @REVIEW: Query Check
+  const [updateStatus] = useUpdateComplaintStatusMutation(); // @REVIEW: Mutation Check
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {

@@ -20,8 +20,8 @@ const NotificationSender = () => {
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [message, setMessage] = useState('');
   
-  const { data: students = [], isLoading: loadingStudents } = useGetStudentsQuery();
-  const [sendNotification, { isLoading }] = useSendNotificationMutation();
+  const { data: students = [], isLoading: loadingStudents } = useGetStudentsQuery(); // @REVIEW: Query Check
+  const [sendNotification, { isLoading }] = useSendNotificationMutation(); // @REVIEW: Mutation Check
 
   const handleSend = async () => {
     try {

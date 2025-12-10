@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { useGetDashboardStatsQuery } from '@/store/api/apiSlice';
 
 const Dashboard = () => {
-  const { data: stats = {}, isLoading } = useGetDashboardStatsQuery();
-
+  const { data: stats = {}, isLoading } = useGetDashboardStatsQuery(); // @REVIEW: Query
+  
   const dashboardStats = {
     totalStudents: stats.totalStudents || 0,
     totalRooms: stats.totalRooms || 0,

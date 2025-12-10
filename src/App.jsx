@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
+import { useSocket } from './hooks/useSocket';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -29,6 +30,8 @@ import StudentIdCard from './pages/student/StudentIdCard';
 import StudentComplaints from './pages/student/StudentComplaints';
 
 function App() {
+  // Initialize Socket.IO connection
+  useSocket();
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Toaster

@@ -4,6 +4,7 @@ const Room = require('../models/Room');
 const Attendance = require('../models/Attendance');
 const Notification = require('../models/Notification');
 const Complaint = require('../models/Complaint');
+const Fee = require('../models/Fee');
 const bcrypt = require('bcryptjs');
 
 // @desc    Register a new student
@@ -14,20 +15,42 @@ const registerStudent = async (req, res) => {
     name, email, password, cnic, phone, address, 
     guardianName, guardianPhone, roomType 
   } = req.body;
-
+  
   try {
+    // Validate required fields
+    if (!name || !email || !password || !cnic || !phone || !address || 
+        !guardianName || !guardianPhone || !roomType) {
+      return res.status(400).json({ 
+        message: 'Please provide all required fields' 
+      });
+    }
+    
+    console.log(`📝 Registering new student: ${email}`);
+    
     // 1. Create User
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
-
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    
     const user = await User.create({
       name, email, password, role: 'student'
     });
-
-    // 2. Allocate Room (Simple logic: find first available room of type)
-    const room = await Room.findOne({ type: roomType, status: { $ne: 'full' } });
-    if (!room) return res.status(400).json({ message: 'No available room of this type' });
-
+    
+    // 2. Allocate Room
+    const room = await Room.findOne({ 
+      type: roomType, 
+      status: { $ne: 'full' } 
+    });
+    
+    if (!room) {
+      // Cleanup: delete created user if room allocation fails
+      await User.findByIdAndDelete(user._id);
+      return res.status(400).json({ 
+        message: 'No available room of this type' 
+      });
+    }
+    
     // 3. Create Student Profile
     const student = await Student.create({
       user: user._id,
@@ -35,16 +58,18 @@ const registerStudent = async (req, res) => {
       guardian: { name: guardianName, phone: guardianPhone },
       room: room._id
     });
-
+    
     // 4. Update Room Occupancy
     room.occupants.push(student._id);
     if (room.occupants.length >= room.capacity) {
       room.status = 'full';
     }
     await room.save();
-
+    
+    console.log(`✅ Student registered successfully: ${student._id}`);
     res.status(201).json(student);
   } catch (error) {
+    console.error('❌ Error in registerStudent:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -104,7 +129,17 @@ const updateStudent = async (req, res) => {
       const user = await User.findById(student.user);
       if (user) {
         if (name) user.name = name;
-        if (email) user.email = email;
+        if (email) {
+          // Check if email is already taken by another user
+          const emailExists = await User.findOne({ 
+            email, 
+            _id: { $ne: student.user } 
+          });
+          if (emailExists) {
+            return res.status(400).json({ message: 'Email already in use' });
+          }
+          user.email = email;
+        }
         await user.save();
       }
     }
@@ -156,6 +191,12 @@ const deleteStudent = async (req, res) => {
         await room.save();
       }
     }
+    
+    // Delete all related records (cascade delete)
+    await Attendance.deleteMany({ student: student._id });
+    await Fee.deleteMany({ student: student._id });
+    await Complaint.deleteMany({ student: student._id });
+    await Notification.deleteMany({ student: student._id });
 
     // Delete associated user account
     await User.findByIdAndDelete(student.user);
@@ -163,7 +204,7 @@ const deleteStudent = async (req, res) => {
     // Delete student record
     await Student.findByIdAndDelete(req.params.id);
     
-    console.log(`✅ Student deleted successfully`);
+    console.log(`✅ Student and all related records deleted successfully`);
     res.json({ message: 'Student deleted successfully' });
   } catch (error) {
     console.error('❌ Error deleting student:', error);
@@ -176,9 +217,26 @@ const deleteStudent = async (req, res) => {
 // @access  Private/Admin
 const createRoom = async (req, res) => {
   try {
-    const room = await Room.create(req.body);
+    const { number, type, capacity, price, floor, status } = req.body;
+    
+    // Validate required fields
+    if (!number || !type || !capacity || price === undefined) {
+      return res.status(400).json({ 
+        message: 'Please provide all required fields (number, type, capacity, price)' 
+      });
+    }
+    
+    // Check for duplicate room number
+    const existingRoom = await Room.findOne({ number });
+    if (existingRoom) {
+      return res.status(400).json({ message: 'Room number already exists' });
+    }
+    
+    const room = await Room.create({ number, type, capacity, price, floor, status });
+    console.log(`✅ Room created: ${room.number}`);
     res.status(201).json(room);
   } catch (error) {
+    console.error('❌ Error creating room:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -188,30 +246,115 @@ const createRoom = async (req, res) => {
 // @access  Private/Admin
 const getRooms = async (req, res) => {
   try {
-    const rooms = await Room.find();
+    console.log('🏠 Fetching all rooms...');
+    const rooms = await Room.find()
+      .populate({
+        path: 'occupants',
+        populate: {
+          path: 'user',
+          select: 'name email'
+        },
+        select: 'cnic phone user'
+      })
+      .sort({ number: 1 });
+    
+    console.log(`✅ Found ${rooms.length} rooms`);
     res.json(rooms);
   } catch (error) {
+    console.error('❌ Error fetching rooms:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Mark attendance
+// @desc    Get attendance by date
+// @route   GET /api/manager/attendance/:date
+// @access  Private/Admin
+const getAttendanceByDate = async (req, res) => {
+  try {
+    const { date } = req.params;
+    console.log('📅 Fetching attendance for date:', date);
+    
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    const attendance = await Attendance.find({
+      date: { $gte: startOfDay, $lte: endOfDay }
+    }).populate('student', '_id');
+    
+    console.log(`✅ Found ${attendance.length} attendance records for ${date}`);
+    res.json(attendance);
+  } catch (error) {
+    console.error('❌ Error fetching attendance:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Mark or update attendance
 // @route   POST /api/manager/attendance
 // @access  Private/Admin
 const markAttendance = async (req, res) => {
   const { date, records } = req.body; // records: [{ studentId, status }]
 
   try {
-    const attendanceRecords = records.map(record => ({
-      student: record.studentId,
-      date: new Date(date),
-      status: record.status,
-      markedBy: req.user._id
-    }));
+    console.log(`📝 Marking/updating attendance for ${date} with ${records.length} records`);
+    
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    // Check if attendance already exists for this date
+    const existingAttendance = await Attendance.find({
+      date: { $gte: targetDate, $lte: endOfDay }
+    });
+    
+    if (existingAttendance.length > 0) {
+      // UPDATE existing attendance
+      console.log('🔄 Updating existing attendance...');
+      
+      const updatePromises = records.map(async (record) => {
+        const existing = existingAttendance.find(
+          a => a.student.toString() === record.studentId
+        );
+        
+        if (existing) {
+          // Update existing record
+          existing.status = record.status;
+          existing.markedBy = req.user._id;
+          return existing.save();
+        } else {
+          // Create new record for student not in original attendance
+          return Attendance.create({
+            student: record.studentId,
+            date: targetDate,
+            status: record.status,
+            markedBy: req.user._id
+          });
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      console.log('✅ Attendance updated successfully');
+      res.json({ message: 'Attendance updated successfully', isUpdate: true });
+    } else {
+      // CREATE new attendance
+      console.log('✨ Creating new attendance records...');
+      
+      const attendanceRecords = records.map(record => ({
+        student: record.studentId,
+        date: targetDate,
+        status: record.status,
+        markedBy: req.user._id
+      }));
 
-    await Attendance.insertMany(attendanceRecords);
-    res.status(201).json({ message: 'Attendance marked successfully' });
+      await Attendance.insertMany(attendanceRecords);
+      console.log('✅ Attendance marked successfully');
+      res.status(201).json({ message: 'Attendance marked successfully', isUpdate: false });
+    }
   } catch (error) {
+    console.error('❌ Error marking attendance:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -224,6 +367,27 @@ const markAttendance = async (req, res) => {
 const sendNotification = async (req, res) => {
   try {
     const { title, message, target, student } = req.body;
+    
+    // Validate required fields
+    if (!title || !message || !target) {
+      return res.status(400).json({ 
+        message: 'Title, message, and target are required' 
+      });
+    }
+    
+    // Validate target values
+    if (!['all', 'specific'].includes(target)) {
+      return res.status(400).json({ 
+        message: 'Target must be "all" or "specific"' 
+      });
+    }
+    
+    // If specific, student ID is required
+    if (target === 'specific' && !student) {
+      return res.status(400).json({ 
+        message: 'Student ID required for specific notifications' 
+      });
+    }
 
     const notification = await Notification.create({
       title,
@@ -231,10 +395,37 @@ const sendNotification = async (req, res) => {
       target,
       student: student || null
     });
-
+    
+    // 🔥 REAL-TIME: Emit socket event for instant notification delivery
+    if (global.io) {
+      if (target === 'all') {
+        // Send to all students
+        global.io.to('students').emit('new-notification', {
+          id: notification._id,
+          title: notification.title,
+          message: notification.message,
+          priority: notification.priority,
+          createdAt: notification.createdAt
+        });
+        console.log(`🔔 Real-time notification sent to all students`);
+      } else if (target === 'specific' && student) {
+        // Send to specific student
+        global.io.to(`user-${student}`).emit('new-notification', {
+          id: notification._id,
+          title: notification.title,
+          message: notification.message,
+          priority: notification.priority,
+          createdAt: notification.createdAt
+        });
+        console.log(`🔔 Real-time notification sent to student ${student}`);
+      }
+    }
+    
+    console.log(`✅ Notification sent: ${target}`);
     res.status(201).json(notification);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error sending notification:', error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -301,7 +492,7 @@ const getDashboardStats = async (req, res) => {
 module.exports = { 
   registerStudent, getStudents, getStudentById, updateStudent, deleteStudent,
   createRoom, getRooms, 
-  markAttendance, sendNotification,
+  markAttendance, getAttendanceByDate, sendNotification,
   getAllComplaints, updateComplaintStatus,
   getDashboardStats
 };

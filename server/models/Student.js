@@ -9,12 +9,14 @@ const studentSchema = new mongoose.Schema({
   },
   cnic: { 
     type: String, 
-    required: true, 
-    unique: true 
+    required: true,
+    trim: true,
+    match: [/^[0-9]{13}$/, 'CNIC must be 13 digits']
   },
   phone: { 
     type: String, 
-    required: true 
+    required: true,
+    match: [/^[0-9]{10,15}$/, 'Please enter a valid phone number']
   },
   address: { 
     type: String, 

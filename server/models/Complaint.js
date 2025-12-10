@@ -73,13 +73,12 @@ complaintSchema.virtual('isOverdue').get(function() {
 });
 
 // Pre-save hook to auto-set resolvedAt
-complaintSchema.pre('save', function(next) {
+complaintSchema.pre('save', async function() {
   if (this.isModified('status') && (this.status === 'resolved' || this.status === 'rejected')) {
     if (!this.resolvedAt) {
       this.resolvedAt = new Date();
     }
   }
-  next();
 });
 
 // Static method to get pending complaints

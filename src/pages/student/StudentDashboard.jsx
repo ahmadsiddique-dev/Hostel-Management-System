@@ -4,11 +4,11 @@ import { Calendar, CreditCard, Bell, IdCard, MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { useGetStudentProfileQuery, useGetAttendanceByStudentQuery, useGetNotificationsQuery, useGetFeesByStudentQuery } from '@/store/api/apiSlice';
 
-const StudentDashboard = () => {
-  const { data: student, isLoading: loadingProfile } = useGetStudentProfileQuery();
-  const { data: attendance = [], isLoading: loadingAttendance } = useGetAttendanceByStudentQuery();
-  const { data: notifications = [], isLoading: loadingNotifications } = useGetNotificationsQuery();
-  const { data: fees = [], isLoading: loadingFees } = useGetFeesByStudentQuery();
+const StudentDashboard = () => { // @REVIEW: Component
+  const { data: student, isLoading: loadingProfile } = useGetStudentProfileQuery(); // @REVIEW: Query Check
+  const { data: attendance = [], isLoading: loadingAttendance } = useGetAttendanceByStudentQuery(student?.user?.id); // @REVIEW: Query Check
+  const { data: notifications = [], isLoading: loadingNotifications } = useGetNotificationsQuery(); // @REVIEW: Query Check
+  const { data: fees = [], isLoading: loadingFees } = useGetFeesByStudentQuery(); // @REVIEW: Query Check
 
   const loading = loadingProfile || loadingAttendance || loadingNotifications || loadingFees;
 

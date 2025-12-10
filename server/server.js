@@ -1,12 +1,27 @@
 const express = require('express');
+const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const { Server } = require('socket.io');
+const { initializeSocket } = require('./socket/socketHandler');
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.IO with CORS
+const io = new Server(server, {
+  cors: {
+    origin: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:5173',
+    credentials: true
+  }
+});
+
+// Initialize socket handlers
+initializeSocket(io);
 
 // Middleware
 app.use(cors({
@@ -36,6 +51,7 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🔌 Socket.IO ready for connections`);
 });

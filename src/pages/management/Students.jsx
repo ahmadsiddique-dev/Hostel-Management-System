@@ -10,7 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 const Students = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
-  const { data: students = [], isLoading: loading } = useGetStudentsQuery();
+  const { data: students = [], isLoading: loading } = useGetStudentsQuery(); // @REVIEW: Query Check
 
   const filteredStudents = students.filter(s => {
     const searchLower = debouncedSearch.toLowerCase();

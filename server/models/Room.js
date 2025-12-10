@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const roomSchema = new mongoose.Schema({
   number: { 
     type: String, 
-    required: true, 
-    unique: true 
+    required: true
   },
   type: { 
     type: String, 
@@ -52,21 +51,23 @@ roomSchema.index({ floor: 1 });
 // Virtual for occupancy percentage
 roomSchema.virtual('occupancyRate').get(function() {
   if (this.capacity === 0) return 0;
+  if (!this.occupants || !Array.isArray(this.occupants)) return 0;
   return Math.round((this.occupants.length / this.capacity) * 100);
 });
 
 // Virtual for available beds
 roomSchema.virtual('availableBeds').get(function() {
+  if (!this.occupants || !Array.isArray(this.occupants)) return this.capacity;
   return this.capacity - this.occupants.length;
 });
 
 // Pre-save hook to auto-update status based on occupants
-roomSchema.pre('save', function(next) {
-  const occupantCount = this.occupants.length;
+roomSchema.pre('save', async function() {
+  const occupantCount = this.occupants?.length || 0;
   
   if (this.status === 'maintenance') {
     // Don't auto-update if in maintenance
-    return next();
+    return;
   }
   
   if (occupantCount >= this.capacity) {
@@ -76,8 +77,6 @@ roomSchema.pre('save', function(next) {
   } else {
     this.status = 'occupied';
   }
-  
-  next();
 });
 
 // Static method to find available rooms by type
