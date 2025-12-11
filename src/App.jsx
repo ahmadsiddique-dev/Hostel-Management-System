@@ -28,6 +28,49 @@ import StudentFees from './pages/student/StudentFees';
 import StudentNotifications from './pages/student/StudentNotifications';
 import StudentIdCard from './pages/student/StudentIdCard';
 import StudentComplaints from './pages/student/StudentComplaints';
+import ChatbotWidget from './components/ui/ChatbotWidget';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from './store/authSlice';
+
+import {
+  useGetStudentProfileQuery,
+  useGetAttendanceByStudentQuery,
+  useGetFeesByStudentQuery,
+  useGetNotificationsQuery
+} from './store/api/apiSlice';
+
+// Wrapper to determine chatbot role
+const ChatbotWrapper = () => {
+  const user = useSelector(selectCurrentUser);
+  const role = user?.role || 'visitor';
+
+  // Fetch Student Context Data (only if role is student)
+  const { data: profile } = useGetStudentProfileQuery(undefined, { skip: role !== 'student' });
+  const { data: attendance } = useGetAttendanceByStudentQuery(undefined, { skip: role !== 'student' });
+  const { data: fees } = useGetFeesByStudentQuery(undefined, { skip: role !== 'student' });
+  const { data: notifications } = useGetNotificationsQuery(undefined, { skip: role !== 'student' });
+
+  let endpoint = 'http://localhost:5001/visitor/query';
+  let title = 'Hostel Assistant';
+  let context = null;
+
+  if (role === 'admin') {
+    endpoint = 'http://localhost:5001/admin/query';
+    title = 'Admin Assistant';
+  } else if (role === 'student') {
+    endpoint = 'http://localhost:5001/student/query';
+    title = 'Student Assistant';
+    context = {
+      name: profile?.user?.name || user?.name,
+      room: profile?.room?.number || 'Not Assigned',
+      attendance: attendance || [],
+      fees: fees || [],
+      notifications: notifications || []
+    };
+  }
+
+  return <ChatbotWidget role={role} endpoint={endpoint} title={title} context={context} />;
+};
 
 function App() {
   // Initialize Socket.IO connection
@@ -57,6 +100,10 @@ function App() {
           },
         }}
       />
+
+      {/* AI Chatbot Widget */}
+      <ChatbotWrapper />
+
       <Router>
         <Routes>
           {/* Public Routes */}

@@ -1,29 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  BedDouble, 
-  UserPlus, 
-  CalendarCheck, 
-  Bell, 
-  LogOut, 
-  CreditCard, 
+import {
+  LayoutDashboard,
+  Users,
+  BedDouble,
+  UserPlus,
+  CalendarCheck,
+  Bell,
+  LogOut,
+  CreditCard,
   IdCard,
   MessageSquare,
   Menu,
   X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/store/authSlice';
 
 const Sidebar = ({ role }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
+
+
+  // ... inside component
+  const dispatch = useDispatch();
+
   const handleSignOut = () => {
-    localStorage.removeItem('token'); // @REVIEW: JWT
-    localStorage.removeItem('user'); // @REVIEW: JWT
+    dispatch(logout());
     navigate('/login');
   };
 
@@ -59,7 +65,7 @@ const Sidebar = ({ role }) => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm">H</div>
             <span className="text-lg font-bold">Hostel<span className="text-primary">AI</span></span>
           </Link>
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 hover:bg-accent rounded-lg transition-colors"
             aria-label="Toggle menu"
@@ -89,16 +95,15 @@ const Sidebar = ({ role }) => {
           {links.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.href;
-            
+
             return (
               <Link key={link.href} to={link.href} onClick={closeSidebar}>
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start gap-3 h-11 ${
-                    isActive 
-                      ? 'bg-primary/10 text-primary hover:bg-primary/20' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={`w-full justify-start gap-3 h-11 ${isActive
+                    ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                    : 'text-muted-foreground hover:text-foreground'
+                    }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">{link.label}</span>
@@ -110,9 +115,9 @@ const Sidebar = ({ role }) => {
 
         {/* Sign Out Button */}
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-border bg-background">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start gap-3 h-11 text-red-500 hover:text-red-600 hover:bg-red-500/10" 
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 h-11 text-red-500 hover:text-red-600 hover:bg-red-500/10"
             onClick={handleSignOut}
           >
             <LogOut className="w-4 h-4 flex-shrink-0" />
@@ -123,7 +128,7 @@ const Sidebar = ({ role }) => {
 
       {/* Overlay for mobile */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={closeSidebar}
         />

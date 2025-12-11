@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import AdminAIBot from '../admin/AdminAIBot';
 
 const ManagerLayout = () => {
   return (
@@ -12,8 +11,6 @@ const ManagerLayout = () => {
           <Outlet />
         </div>
       </main>
-      {/* Draggable AI Bot Overlay */}
-      <AdminAIBot />
     </div>
   );
 };

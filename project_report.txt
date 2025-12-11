@@ -1,0 +1,114 @@
+HOSTEL MANAGEMENT SYSTEM - PROJECT REPORT
+Generated on: 2025-12-11
+
+================================================================================
+1. PROJECT OVERVIEW
+================================================================================
+This is a comprehensive Hostel Management System built using the MERN stack (MongoDB, Express.js, React, Node.js). It serves two primary user roles:
+1. Managers/Admins: Manage students, rooms, attendance, complaints, and notifications.
+2. Students: View profile, attendance, fees, notifications, and submit complaints.
+
+Technology Stack:
+- Frontend: React (Vite), Tailwind CSS, Shadcn UI, Redux Toolkit, RTK Query, React Router DOM.
+- Backend: Node.js, Express.js, MongoDB (Mongoose), JWT Auth.
+- Tools: Axios, Lucide React (Icons), React Hot Toast, Recharts (Charts).
+
+================================================================================
+2. FRONTEND ARCHITECTURE (src/)
+================================================================================
+
+A. Routing System (App.jsx)
+   The application uses `react-router-dom` with distinct layouts for different roles:
+   - Public Routes:
+     - `/`: Landing Page (Features, Testimonials)
+     - `/login`: Student Login
+     - `/admin/login`: Admin Login
+     - `/secret-admin-register`: Admin Registration (Hidden)
+
+   - Manager Routes (Protected, wrapped in ManagerLayout):
+     - `/admin/dashboard`: Overview stats (students, rooms, attendance).
+     - `/admin/students`: Student list & management.
+     - `/admin/register`: Register new student.
+     - `/admin/attendance`: Mark/View attendance.
+     - `/admin/notifications`: Send announcements.
+     - `/admin/rooms`: Room management (capacity, status).
+     - `/admin/complaints`: specific complaint management.
+
+   - Student Routes (Protected, wrapped in StudentLayout):
+     - `/student/dashboard`: Personal stats & quick links.
+     - `/student/attendance`: My attendance history.
+     - `/student/fees`: specific fees status & history.
+     - `/student/notifications`: Personal & broadcast notifications.
+     - `/student/id-card`: Digital Identity Card.
+     - `/student/complaints`: File & track complaints.
+
+B. State Management (src/store/)
+   1. authSlice.js (Redux):
+      - Manages `user`, `token`, and `role`.
+      - Persists auth state to `localStorage` for session restoration.
+      - Actions: `setCredentials`, `logout`.
+
+   2. apiSlice.js (RTK Query):
+      - Centralized API definition.
+      - Base Query: Uses `axios` with an interceptor to inject the JWT token from state into headers.
+      - Caching: Automated cache invalidation via tags ('Students', 'Rooms', 'Attendance', etc.) ensures UI updates immediately after mutations (e.g., adding a student updates the list).
+
+C. Key Components
+   - layouts/: `Sidebar` (role-based navigation), `Navbar`.
+   - ui/: Reusable generic components (Buttons, Cards, Inputs) from Shadcn UI.
+   - admin/: specialized components like `NotificationSender`.
+
+================================================================================
+3. BACKEND ARCHITECTURE (server/)
+================================================================================
+
+A. Database Models (server/models/)
+   1. User: Auth credentials (name, email, password, role).
+   2. Student: Profile details (CNIC, phone, guardian), linked to `User` and `Room`.
+   3. Room: Capacity, type, status, list of occupants.
+   4. Attendance: Daily records linked to `Student`.
+   5. Complaint: Issues raised by students, status tracking.
+   6. Notification: Broadcast or targeted messages.
+   7. Fee: Payment records and status.
+
+B. Controllers (server/controllers/)
+   These contain the core business logic:
+
+   1. authController.js:
+      - `loginUser`: Verifies credentials, issues JWT (HttpOnly cookie + response).
+      - `registerUser`: Creates initial Admin accounts.
+      - `refreshToken`: Handles session renewal.
+
+   2. managerController.js (Admin Access):
+      - `getDashboardStats`: Aggregates real-time counts.
+      - `registerStudent`: Creates User + Student profile + Allocates Room (Atomic operation).
+      - `getStudents/getStudentById`: Fetches student data with populated fields.
+      - `markAttendance`: Bulk attendance marking.
+      - `sendNotification`: Creates notification records.
+      - `createRoom`: Adds new rooms linked to capacity logic.
+
+   3. studentController.js (Student Access):
+      - `getProfile`: Fetches own data based on logged-in user ID.
+      - `getAttendance`: Returns own attendance history.
+      - `getFees`: Returns own fee records.
+      - `createComplaint`: Submits a new issue.
+
+C. Internal Connections & Middleware
+   - authMiddleware.js:
+     - `protect`: Verifies JWT from header/cookie, decodes userId, attaches `req.user`.
+     - `admin`: Checks if `req.user.role === 'admin'`.
+   
+   - Data Flow:
+     Request -> Server.js -> Routes (auth/manager/student) -> Middleware (Auth Check) -> Controller -> Mongoose Model -> MongoDB Atlas.
+
+================================================================================
+4. KEY INTERNAL FUNCTIONS
+================================================================================
+
+- `loginUser(email, password)`: Authenticates and returns { user, token }.
+- `registerStudent(data)`: Complex transaction that creates a User account, a Student profile, and updates Room occupancy simultaneously.
+- `useGetDashboardStatsQuery()`: Frontend hook that pulls live stats for the admin dashboard.
+- `useSocket()`: Custom hook initialized in App.jsx (prepared for future real-time features).
+
+================================================================================
+END OF REPORT

@@ -5,6 +5,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Send, Users, User } from 'lucide-react';
 import toast from 'react-hot-toast';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { useSendNotificationMutation, useGetStudentsQuery } from '@/store/api/apiSlice';
 
 // Fallback for Textarea
@@ -83,18 +93,21 @@ const NotificationSender = () => {
               {loadingStudents ? (
                 <div className="text-sm text-muted-foreground">Loading students...</div>
               ) : (
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={selectedStudentId}
-                  onChange={(e) => setSelectedStudentId(e.target.value)}
-                >
-                  <option value="">-- Select a student --</option>
-                  {students.map((student) => (
-                    <option key={student._id} value={student._id}>
-                      {student.user?.name || 'Unknown'} ({student.room?.number || 'No Room'})
-                    </option>
-                  ))}
-                </select>
+                <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a student" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Students</SelectLabel>
+                      {students.map((student) => (
+                        <SelectItem key={student._id} value={student._id}>
+                          {student.user?.name || 'Unknown'} ({student.room?.number || 'No Room'})
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               )}
             </div>
           )}
