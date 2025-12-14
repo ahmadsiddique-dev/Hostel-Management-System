@@ -74,7 +74,7 @@ const BentoGrid = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </div> 
 
           {/* Medium card */}
           <div className="bento-item sm:col-span-1 lg:col-span-2 bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 relative overflow-hidden group hover:border-purple-500/50 transition-all duration-500">

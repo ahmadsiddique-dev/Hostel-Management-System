@@ -2,7 +2,7 @@ require('dotenv').config();
 
 // Using existing variable name as requested, though it contains OpenRouter key
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = 'google/gemma-3-27b-it:free'; // OpenRouter Model
+const MODEL = 'google/gemma-3-12b-it:free'; // OpenRouter Model
 
 const generateResponse = async (prompt, systemInstruction = '') => {
   try {
@@ -35,7 +35,7 @@ const generateResponse = async (prompt, systemInstruction = '') => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ OpenRouter API Error (${response.status}):`, errorText);
+      console.error(`❌ OpenRouter API Error (${response.status}):`,  errorText);
       
       if (response.status === 429 || response.status === 402) {
         return {
@@ -51,7 +51,7 @@ const generateResponse = async (prompt, systemInstruction = '') => {
     const text = data.choices && data.choices[0] && data.choices[0].message 
       ? data.choices[0].message.content 
       : '';
-
+ 
     console.log('🤖 OpenRouter Response received');
 
     return {
@@ -68,4 +68,4 @@ const generateResponse = async (prompt, systemInstruction = '') => {
   }
 };
 
-module.exports = { generateResponse };
+module.exports = { generateResponse }; 

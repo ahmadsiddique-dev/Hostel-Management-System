@@ -7,6 +7,12 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gravity_hostel')
+  .then(() => console.log('📦 Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // Middleware
 app.use(cors());
