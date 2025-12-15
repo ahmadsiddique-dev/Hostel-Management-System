@@ -29,20 +29,20 @@ const FeaturesSection = () => {
   const features = [
     {
       icon: TrendingUp,
-      title: "Revenue Optimization",
-      description: "Dynamic pricing based on demand, season, and market trends. Maximize occupancy while maintaining competitive rates.",
+      title: "Revenue Management",
+      description: "Timely and accurate billing and payment processing to ensure smooth cash flow. No hidden & extra charges.",
       color: "emerald"
     },
     {
       icon: Home,
       title: "Maintenance Management",
-      description: "Track issues, assign tasks, and monitor completion. Keep your facility in perfect condition with minimal effort.",
+      description: "Fast Maintenance and within 24 hours response time. Completely free of cost and satisfying.",
       color: "blue"
     },
     {
       icon: Globe,
-      title: "Multi-Branch Support",
-      description: "Manage unlimited locations from one dashboard. Centralized control with local customization.",
+      title: "24/7 Support",
+      description: "Any query or any issue, we are available 24/7 to assist you and to listen you.",
       color: "purple"
     }
   ];

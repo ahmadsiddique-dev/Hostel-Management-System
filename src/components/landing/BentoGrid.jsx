@@ -37,10 +37,10 @@ const BentoGrid = () => {
           <h2 className="text-5xl md:text-6xl font-bold">
             Everything You Need.
             <br />
-            <span className="text-gray-500">Nothing You Don't.</span>
+            <span className="text-gray-500 mt-3">Leave on us.</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Built for modern campus living with cutting-edge technology
+            Built for modern campus living with AI technology
           </p>
         </div>
 
@@ -56,7 +56,7 @@ const BentoGrid = () => {
               
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Intelligent Room Management</h3>
               <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 leading-relaxed">
-                AI-powered room allocation that matches students with perfect roommates. Automatic conflict resolution and preference learning.
+                AI-powered room allocation that matches students with perfect roommates.
               </p>
 
               {/* Feature list */}
@@ -81,8 +81,8 @@ const BentoGrid = () => {
             <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
               <Shield className="w-6 h-6 sm:w-7 sm:h-7 text-purple-400" />
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Bank-Grade Security</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">256-bit encryption with compliance to international standards</p>
+            <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Full Security</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Security Contract with Ababeel Security (24/7).</p>
           </div>
 
           {/* Medium card */}
@@ -91,7 +91,7 @@ const BentoGrid = () => {
               <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-green-400" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Lightning Fast</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Sub-50ms response time with edge caching worldwide</p>
+            <p className="text-gray-400 text-xs sm:text-sm">Lightening fast internet with the speed of 100Mbps</p>
           </div>
 
           {/* Wide card with chart */}
@@ -124,15 +124,15 @@ const BentoGrid = () => {
               <Smartphone className="w-6 h-6 sm:w-7 sm:h-7 text-pink-400" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Mobile First Design</h3>
-            <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">Native apps for iOS and Android with offline support</p>
+            <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">Modern web design to fullfill the need of all different devices</p>
             
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <div className="bg-black/30 rounded-lg p-2 sm:p-3 border border-white/5">
                 <div className="text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Active Users</div>
-                <div className="text-lg sm:text-2xl font-bold">24.5K</div>
+                <div className="text-lg sm:text-2xl font-bold">700+</div>
               </div>
               <div className="bg-black/30 rounded-lg p-2 sm:p-3 border border-white/5">
-                <div className="text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">App Rating</div>
+                <div className="text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Web App Rating</div>
                 <div className="text-lg sm:text-2xl font-bold text-yellow-400">4.9★</div>
               </div>
             </div>
@@ -160,7 +160,7 @@ const BentoGrid = () => {
               <Wifi className="w-6 h-6 sm:w-7 sm:h-7 text-orange-400" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">IoT Ready</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Smart locks, sensors, and automation</p>
+            <p className="text-gray-400 text-xs sm:text-sm">Smart AI based model and automation.</p>
           </div>
         </div>
       </div>

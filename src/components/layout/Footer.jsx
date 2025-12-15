@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">Hostel<span className="text-blue-500">AI</span></h3>
+            <h3 className="text-2xl font-bold text-white">Gravity<span className="text-blue-500">AI</span></h3>
             <p className="text-slate-400 text-sm leading-relaxed">
               Revolutionizing hostel management with AI-driven solutions. Smart, secure, and seamless living for students.
             </p>
@@ -26,9 +26,9 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-white mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li className="flex items-center gap-2"><Mail size={16} /> support@hostelai.com</li>
+              <li className="flex items-center gap-2"><Mail size={16} /> contact@gravity.com</li>
               <li className="flex items-center gap-2"><Phone size={16} /> +1 (555) 123-4567</li>
-              <li className="flex items-center gap-2"><MapPin size={16} /> 123 University Ave, Tech City</li>
+              <li className="flex items-center gap-2"><MapPin size={16} /> 123 Bosan Road, University of Education Multan Campus.</li>
             </ul>
           </div>
 
@@ -48,7 +48,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-slate-500">© 2025 HostelAI. All rights reserved.</p>
+          <p className="text-xs text-slate-500">© 2025 Gravity-Hoste. All rights reserved.</p>
           <div className="flex space-x-4">
             <a href="#" className="text-slate-400 hover:text-white transition-colors"><Facebook size={18} /></a>
             <a href="#" className="text-slate-400 hover:text-white transition-colors"><Twitter size={18} /></a>

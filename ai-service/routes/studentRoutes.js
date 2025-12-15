@@ -7,8 +7,8 @@ const { protect } = require('../middleware/authMiddleware');
 router.post('/query', protect, handleStudentQuery);
 
 // Test Route
-router.get('/test', (req, res) => {
-  res.json({ message: 'Student AI Service is running' });
-});
+// router.get('/test', (req, res) => {
+//   res.json({ message: 'Student AI Service is running' });
+// });
 
 module.exports = router;

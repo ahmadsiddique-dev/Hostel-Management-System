@@ -27,8 +27,8 @@ const StatsSection = () => {
 
   const stats = [
     { number: "99.9", suffix: "%", label: "Uptime" },
-    { number: "500", suffix: "+", label: "Active Hostels" },
-    { number: "50", suffix: "K+", label: "Students" },
+    { number: "500", suffix: "+", label: "Active Students" },
+    { number: "5000", suffix: "+", label: "Alumni" },
     { number: "24", suffix: "/7", label: "Support" },
   ];
 

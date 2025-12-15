@@ -46,10 +46,10 @@ const HeroSection = () => {
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.1] tracking-tight text-white">
-              Smart Living,
+            Hostel Living,
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-                Simplified.
+                Redefined.
               </span>
             </h1>
 
@@ -57,7 +57,7 @@ const HeroSection = () => {
               Transform your hostel operations with AI-powered automation. From room allocation to fee management, experience seamless administration.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="h-14 px-8 text-lg rounded-full bg-white text-black hover:bg-gray-100 transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105">
                 Get Started Free
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -65,7 +65,7 @@ const HeroSection = () => {
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-white/30 text-white hover:bg-white/10 backdrop-blur-sm">
                 Watch Demo
               </Button>
-            </div>
+            </div> */}
 
             {/* Trust badges */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-4">
@@ -76,7 +76,7 @@ const HeroSection = () => {
                   ))}
                 </div>
                 <div className="text-sm text-gray-200">
-                  <span className="text-white font-semibold">500+</span> Hostels
+                  <span className="text-white font-semibold">500+</span> Students
                 </div>
               </div>
               <div className="flex items-center gap-1">
