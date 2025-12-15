@@ -4,7 +4,10 @@ require('dotenv').config();
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = 'google/gemma-3-12b-it:free'; // OpenRouter Model
 
-const generateResponse = async (prompt, systemInstruction = '') => {
+const generateResponse = async (prompt, systemInstruction = '', retryCount = 0) => {
+  const MAX_RETRIES = 3;
+  const BACKOFF_BASE = 2000; // 2 seconds
+
   try {
     const messages = [];
     
@@ -17,7 +20,7 @@ const generateResponse = async (prompt, systemInstruction = '') => {
     // Add user prompt
     messages.push({ role: 'user', content: finalPrompt });
 
-    console.log(`🚀 Sending request to OpenRouter (${MODEL})...`);
+    console.log(`🚀 Sending request to OpenRouter (${MODEL})... (Attempt ${retryCount + 1})`);
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -38,6 +41,12 @@ const generateResponse = async (prompt, systemInstruction = '') => {
       console.error(`❌ OpenRouter API Error (${response.status}):`,  errorText);
       
       if (response.status === 429 || response.status === 402) {
+        if (retryCount < MAX_RETRIES) {
+           const waitTime = BACKOFF_BASE * (retryCount + 1); // 2s, 4s, 6s
+           console.warn(`⏳ Rate Limit Hit. Waiting ${waitTime}ms before retry...`);
+           await new Promise(resolve => setTimeout(resolve, waitTime));
+           return generateResponse(prompt, systemInstruction, retryCount + 1);
+        }
         return {
           success: false,
           response: 'I am receiving too many requests right now. Please wait a moment and try again.'

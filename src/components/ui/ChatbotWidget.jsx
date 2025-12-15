@@ -10,10 +10,19 @@ import Draggable from 'react-draggable';
 import ReactMarkdown from 'react-markdown';
 
 const ChatbotWidget = ({ role, endpoint, title, context }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, text: `Hello! I'm your ${role === 'visitor' ? 'Hostel' : 'AI'} Assistant. How can I help you?`, sender: 'bot' }
-  ]);
+  if (role === 'admin') return null;
+  const STORAGE_KEY = `chat_history_${role}`;
+  const [isOpen, setIsOpen] = useState(() => {
+    return localStorage.getItem('chat_isOpen') === 'true';
+  });
+
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [
+      { id: 1, text: `Hello! I'm your ${role === 'visitor' ? 'Hostel' : 'AI'} Assistant. How can I help you?`, sender: 'bot' }
+    ];
+  });
+
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -25,11 +34,25 @@ const ChatbotWidget = ({ role, endpoint, title, context }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isOpen, isLoading]);
 
-  // Reset chat when role changes
+  // Persist State
   useEffect(() => {
-    setMessages([
-      { id: Date.now(), text: `Hello! I'm your ${role === 'visitor' ? 'Hostel' : 'AI'} Assistant. How can I help you?`, sender: 'bot' }
-    ]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages, role]);
+
+  useEffect(() => {
+    localStorage.setItem('chat_isOpen', isOpen);
+  }, [isOpen]);
+
+  // Handle Role Change (Load new history or default)
+  useEffect(() => {
+    const saved = localStorage.getItem(`chat_history_${role}`);
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    } else {
+      setMessages([
+        { id: Date.now(), text: `Hello! I'm your ${role === 'visitor' ? 'Hostel' : 'AI'} Assistant. How can I help you?`, sender: 'bot' }
+      ]);
+    }
   }, [role]);
 
   const handleSendMessage = async (e) => {
@@ -42,14 +65,18 @@ const ChatbotWidget = ({ role, endpoint, title, context }) => {
     setIsLoading(true);
 
     try {
-      const headers = { 'Content-Type': 'application/json' };
+      const headers = { 'Content-Type': 'application/json' }; 
       if (token && role !== 'visitor') {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const body = { prompt: userMsg.text };
+      const body = {
+        prompt: userMsg.text,
+        history: messages.slice(-10).map(m => ({ role: m.sender, content: m.text })) // Send last 10 messages
+      };
       if (role === 'student' && context) {
         body.studentData = context;
+        console.log("studentData", context);
       }
 
       const response = await fetch(endpoint, {

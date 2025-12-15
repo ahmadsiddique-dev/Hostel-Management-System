@@ -19,26 +19,14 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const adminRoutes = require('./routes/adminRoutes');
+// const adminRoutes = require('./routes/adminRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const visitorRoutes = require('./routes/visitorRoutes');
 
 // Mount Routes
-app.use('/admin', adminRoutes);
+// app.use('/admin', adminRoutes);
 app.use('/student', studentRoutes);
 app.use('/visitor', visitorRoutes);
-
-// Root Route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'AI Microservice is running',
-    services: {
-      admin: '/admin/query (Protected)',
-      student: '/student/query (Protected)',
-      visitor: '/visitor/query (Public)'
-    }
-  });
-});
 
 // Start Server
 app.listen(PORT, () => {

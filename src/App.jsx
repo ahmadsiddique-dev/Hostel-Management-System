@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 import { useSocket } from './hooks/useSocket';
@@ -42,7 +43,35 @@ import {
 // Wrapper to determine chatbot role
 const ChatbotWrapper = () => {
   const user = useSelector(selectCurrentUser);
-  const role = user?.role || 'visitor';
+  const location = useLocation();
+
+  // 1. Default to Redux State
+  let role = user?.role || 'visitor';
+
+  // 2. Fallback/Override based on URL (Fixes Refresh Issue)
+  // If Redux is loading (role is visitor) but URL is /admin, force 'admin'
+  if (role === 'visitor') {
+    if (location.pathname.startsWith('/admin') && !location.pathname.includes('/login')) {
+      role = 'admin';
+    } else if (location.pathname.startsWith('/student') && !location.pathname.includes('/login')) {
+      role = 'student';
+    }
+  }
+
+  console.log('🤖 ChatbotWrapper Debug:', {
+    reduxRole: user?.role,
+    path: location.pathname,
+    finalRole: role
+  });
+
+  // Force Token Refresh on Refresh (if role is known but token might be missing)
+  useEffect(() => {
+    if (role !== 'visitor') {
+      import('./utils/tokenManager').then(({ scheduleTokenRefresh }) => {
+        scheduleTokenRefresh(0); // Refresh immediately
+      });
+    }
+  }, [role]);
 
   // Fetch Student Context Data (only if role is student)
   const { data: profile } = useGetStudentProfileQuery(undefined, { skip: role !== 'student' });
@@ -61,7 +90,7 @@ const ChatbotWrapper = () => {
     endpoint = 'http://localhost:5001/student/query';
     title = 'Student Assistant';
     context = {
-      name: profile?.user?.name || user?.name,
+      name: profile?.user?.name || user?.name || 'Student',
       room: profile?.room?.number || 'Not Assigned',
       attendance: attendance || [],
       fees: fees || [],
@@ -101,10 +130,10 @@ function App() {
         }}
       />
 
-      {/* AI Chatbot Widget */}
-      <ChatbotWrapper />
-
       <Router>
+        {/* AI Chatbot Widget (Inside Router now) */}
+        <ChatbotWrapper />
+
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />

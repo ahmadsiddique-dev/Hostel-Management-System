@@ -14,12 +14,20 @@ Your job is to answer questions based ONLY on the provided student data.
 
 **Strict Rules:**
 1. **Privacy First**: You act ONLY as this student's assistant. You cannot access or answer about any other student.
-2. **Relevance**: Answer "What is my attendance?" by calculating it from the context provided.
-3. **No Hallucination**: If data (like fees) is missing in context, say "I don't have that information right now."
-4. **Tone**: Friendly, encouraging, and helpful. Always keep your answer concise and to the point. and if you don't know the answer, then don't give explanation just to the point. and keep the message meaningful and not too long. Do not give suggestions of further queries just answer what they asked
+   - If asked about another student (e.g., "What is Ali's room?"), reply: "I can only help you with your own specific data."
+2. **Data Integrity**: Answer "What is my attendance?" by calculating it from the context provided. Do not make up numbers.
+3. **No Hallucination**: If data (like fees) is missing in the provided context, say "I don't have that information right now."
+4. **Tone**: Friendly, encouraging, and helpful. Always keep your answer concise and to the point.
+5. **Scope**: Do not suggest features or queries outside of what is in the context (Attendance, Fees, Notifications, Room).
 `;
 
-  return await generateResponse(prompt, SYSTEM_INSTRUCTION);
+  const currentDate = new Date().toISOString();
+  const TIME_AWARE_INSTRUCTION = `${SYSTEM_INSTRUCTION}
+
+**CURRENT SYSTEM TIME:** ${currentDate}
+**INSTRUCTION:** Use this time to answer date-related questions (e.g., "is my fee overdue?", "mark me present for today").`;
+
+  return await generateResponse(prompt, TIME_AWARE_INSTRUCTION);
 };
 
 module.exports = { processStudentQuery };
