@@ -39,6 +39,7 @@ const Login = () => {
 
       // New auth structure: { user, accessToken }
       // Refresh token is in httpOnly cookie
+      // if (data.user.role === "student") {}
       dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
       toast.success(`Welcome back, ${data.user.name}!`);
       navigate('/student/dashboard');

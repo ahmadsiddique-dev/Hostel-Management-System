@@ -15,7 +15,7 @@ const server = http.createServer(app);
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:5173',
+    origin: process.env.SOCKET_CORS_ORIGIN,
     credentials: true
   }
 });
@@ -25,14 +25,14 @@ initializeSocket(io);
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Frontend URL
+  origin: process.env.SOCKET_CORS_ORIGIN, // Frontend URL
   credentials: true // Allow cookies
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gravity_hostel')
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
   res.send('Gravity Hostel Management API is running');
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

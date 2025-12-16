@@ -3,7 +3,7 @@ import { logout } from '../authSlice';
 import { getAccessToken, setAccessToken } from '../../utils/tokenManager';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseUrl: import.meta.env.VITE_API_URL,
   credentials: 'include', // CRITICAL: Send cookies (for refresh token)
   prepareHeaders: (headers) => {
     // Get token from memory, not Redux state

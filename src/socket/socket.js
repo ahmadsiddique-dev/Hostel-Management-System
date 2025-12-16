@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 // Get API URL from environment
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '');
 
 // Create socket instance (don't auto-connect yet)
 const socket = io(SOCKET_URL, {

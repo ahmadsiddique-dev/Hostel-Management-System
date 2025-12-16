@@ -86,11 +86,16 @@ const registerUser = async (req, res) => {
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
       });
       
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
       // Send refresh token as httpOnly cookie
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
       });
       
@@ -141,11 +146,16 @@ const loginUser = async (req, res) => {
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
       });
       
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
       // Send refresh token as httpOnly cookie
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
       });
       
@@ -214,11 +224,16 @@ const refreshAccessToken = async (req, res) => {
     // Generate new access token
     const newAccessToken = generateAccessToken(storedToken.userId._id, storedToken.userId.role);
     
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'
+    })
     // Send new refresh token as cookie
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
     
@@ -250,7 +265,11 @@ const logoutUser = async (req, res) => {
     }
     
     // Clear cookie
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'
+    });
     
     console.log(`👋 User logged out: ${req.user?.email || 'unknown'}`);
     
@@ -277,7 +296,11 @@ const logoutAllDevices = async (req, res) => {
     );
     
     // Clear current cookie
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'
+    });
     
     console.log(`🚪 User logged out from all devices: ${req.user.email}`);
     

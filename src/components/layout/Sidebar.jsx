@@ -30,7 +30,8 @@ const Sidebar = ({ role }) => {
 
   const handleSignOut = () => {
     dispatch(logout());
-    navigate('/login');
+    role === "admin" ? navigate('/admin/login') : navigate("/login")
+    
   };
 
   const managerLinks = [

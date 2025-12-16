@@ -27,7 +27,7 @@ const generateResponse = async (prompt, systemInstruction = '', retryCount = 0) 
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:5001', // Required by OpenRouter for free tier
+        'HTTP-Referer': process.env.FRONTEND_URL, // Required by OpenRouter for free tier
         'X-Title': 'Hostel AI'
       },
       body: JSON.stringify({

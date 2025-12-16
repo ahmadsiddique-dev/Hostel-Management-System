@@ -9,7 +9,7 @@ const Complaint = require('../models/Complaint');
 // @access  Private/Student
 const getProfile = async (req, res) => {
   try {
-    console.log(`👤 Fetching profile for user: ${req.user._id}`);
+    // console.log(`👤 Fetching profile for user: ${req.user._id}`);
     const student = await Student.findOne({ user: req.user._id })
       .populate('user', 'name email role')
       .populate({
@@ -42,11 +42,13 @@ const getProfile = async (req, res) => {
 // @access  Private/Student
 const getAttendance = async (req, res) => {
   try {
-    const student = await Student.findOne({ user: req.user._id });
+    const student = await Student.findOne({ user : req.user._id });
+    console.log("OK :", student );
     if (!student) return res.status(404).json({ message: 'Student profile not found' });
-
+    
     const attendance = await Attendance.find({ student: student._id }).sort({ date: -1 });
     res.json(attendance);
+    console.log("attendence : ", attendance);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -109,7 +111,7 @@ const createComplaint = async (req, res) => {
       return res.status(404).json({ message: 'Student profile not found. Please contact admin.' });
     }
     
-    console.log('✅ Found student:', student._id);
+    // console.log('✅ Found student:', student._id);
     const complaint = await Complaint.create({
       student: student._id,
       title,
