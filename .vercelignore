@@ -1,0 +1,4 @@
+server/
+ai-service/
+*.log
+node_modules/
