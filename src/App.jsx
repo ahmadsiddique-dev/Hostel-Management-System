@@ -79,15 +79,15 @@ const ChatbotWrapper = () => {
   const { data: fees } = useGetFeesByStudentQuery(undefined, { skip: role !== 'student' });
   const { data: notifications } = useGetNotificationsQuery(undefined, { skip: role !== 'student' });
 
-  let endpoint = 'http://localhost:5001/visitor/query';
+  let endpoint = `${import.meta.env.VITE_AI_MODEL}/visitor/query`;
   let title = 'Hostel Assistant';
   let context = null;
 
   if (role === 'admin') {
-    endpoint = 'http://localhost:5001/admin/query';
+    endpoint = `${import.meta.env.VITE_AI_MODEL}/admin/query`;
     title = 'Admin Assistant';
   } else if (role === 'student') {
-    endpoint = 'http://localhost:5001/student/query';
+    endpoint = `${import.meta.env.VITE_AI_MODEL}/student/query`;
     title = 'Student Assistant';
     context = {
       name: profile?.user?.name || user?.name || 'Student',
