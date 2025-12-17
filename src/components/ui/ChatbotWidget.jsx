@@ -35,24 +35,19 @@ const ChatbotWidget = ({ role, endpoint, title, context }) => {
   }, [messages, isOpen, isLoading]);
 
   // Persist State
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages, role]);
+  // useEffect(() => {
+  //   localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  // }, [messages, role]);
 
-  useEffect(() => {
-    localStorage.setItem('chat_isOpen', isOpen);
-  }, [isOpen]);
+  // useEffect(() => {
+  //   localStorage.setItem('chat_isOpen', isOpen);
+  // }, [isOpen]);
 
   // Handle Role Change (Load new history or default)
   useEffect(() => {
-    const saved = localStorage.getItem(`chat_history_${role}`);
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    } else {
       setMessages([
         { id: Date.now(), text: `Hello! I'm your ${role === 'visitor' ? 'Hostel' : 'AI'} Assistant. How can I help you?`, sender: 'bot' }
       ]);
-    }
   }, [role]);
 
   const handleSendMessage = async (e) => {
